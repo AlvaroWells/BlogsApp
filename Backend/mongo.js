@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import mongoose from 'mongoose'
-import Blog from './models/blogs.js'
+import bcrypt from 'bcrypt'
+import Blog from './models/blog.js'
+import User from './models/user.js'
 import { GoogleGenAI } from '@google/genai'
 
 // Configuración inicial
@@ -47,19 +49,43 @@ async function main() {
   try {
     await mongoose.connect(url)
     console.log("✔ Conectado a MongoDB");
-    //guardamos la información de los blogs generados por la funcion IA
+
+    /* Buscar usuario (o crear uno si no existe) */
+    let user = await User.findOne({ username: 'ia-bot' })
+
+    if (!user) {
+      user = new User({
+        username: 'ia-bot',
+        name: 'Generador automático',
+        passwordHash: await bcrypt.hash('password1', 10)
+      })
+      await user.save()
+      console.log('Usuario de prueba creado')
+    }
+
+    /* Obtener blogs de IA */
     const blogsText = await generateBlogsWithAI()
     if (!blogsText) return
 
-    //  1. Limpiar etiquetas markdown
+    /*  1. Limpiar etiquetas markdown */
     const cleanText = blogsText.replace(/```json|```/g, '').trim()
-
-    //  2. Parsear a array de objetos
-    const blogs = JSON.parse(cleanText)
+    
+    /*  2. Parsear a array de objetos */
+    const blogsData = JSON.parse(cleanText)
+    
+    /*  3. Asociar User a cada blog */
+    const blogs = blogsData.map(blog => ({
+      ...blog,
+      user: user._id
+    }))
     console.log(blogs)
-    //  3. Insertar en la base de datos
-    await Blog.insertMany(blogs)
-    console.log("✅ Blogs insertados correctamente")
+
+    /* Insertar blogs y guardar referencias en el usuario */
+    const savedBlogs = await Blog.insertMany(blogs)
+    user.blogs = user.blogs.concat(savedBlogs.map(b => b._id))
+    await user.save()
+
+    console.log("✅ Blogs generados y asignados al usuario")
   } catch (error) {
     console.error("❌ Error:", error.message)
   } finally {
