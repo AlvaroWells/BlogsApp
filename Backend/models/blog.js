@@ -1,4 +1,3 @@
-// const mongoose = require('mongoose')
 import mongoose from 'mongoose'
 
 //* Creamos el esquema que seguirán los blogs al crearse en la base de datos.
