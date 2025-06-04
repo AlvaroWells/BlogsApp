@@ -1,5 +1,5 @@
-// import jwt from 'jwt'
-// import User from './models/User'
+import jwt from 'jsonwebtoken'
+import User from '../models/user.js'
 
 
 
@@ -12,7 +12,38 @@ const requestLogger = (req, res, next) => {
   next()
 }
 
+/* Middleware para extraer el token del paquete de jwt */
+const tokenExtractor = (req, res, next) => {
+  const authorization = req.get('authorization')
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+    req.token = authorization.subString(7)
+  } else {
+    req.token = null
+  }
+  next()
+}
+
+/* Middleware para obtener la información del usuario de la base de datos */
+const userExtractor = async (req, res, next) => {
+  try{
+    const decodedToken = jwt.verify(req.token, process.env.SECRET)
+    if (!decodedToken.id) {
+      return res.status(401).json({ error: 'token invalid' })
+    }
+    const user = await User.findById(decodedToken.id)
+    req.user = user
+    next()
+  } catch (error) {
+    console.error('error', error.message)
+    res.status(401).json({
+      error: error.message
+    })
+  }
+}
+
 
 export default {
-  requestLogger
+  requestLogger,
+  userExtractor,
+  tokenExtractor
 }
