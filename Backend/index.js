@@ -3,6 +3,8 @@ import express from 'express'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import blogRouter from './controllers/blogs.js'
+import userRouter from './controllers/users.js'
+import middleware from './utils/middleware.js'
 const app = express()
 
 /* Permitimos el filtrado por campos que no estén definidos en el equema */
@@ -12,7 +14,7 @@ mongoose.set('strictQuery', false)
 //const DEV_TIMEOUT = 30000000000000000n
 
 /* Inicializamos la conexión a MongoDB */
-mongoose.connect(process.env.TEST_MONGODB_URI)
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('Connected to MongoDB')
     /* timeout en development */
@@ -28,9 +30,11 @@ mongoose.connect(process.env.TEST_MONGODB_URI)
 /* Paquetes de express */
 app.use(cors())
 app.use(express.json())
+app.use(middleware.requestLogger)
 
-/* nombre ruta de la api */
+/* nexos de entrada a los enrutadores de la app */
 app.use('/api/blogs', blogRouter)
+app.use('/api/users', userRouter)
 
 /* Puerta de escucha de la app */
 app.listen(process.env.PORT, () => {
