@@ -1,0 +1,4 @@
+@baseurl = http://localhost:3001/api
+
+POST {{baseurl}}/users
+Content-Type: application/json

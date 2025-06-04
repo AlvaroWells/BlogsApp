@@ -1,0 +1,5 @@
+@baseurl = http://localhost:3001/api
+
+### Crear blogs automáticos con IA ###
+POST {{baseurl}}/blogs
+Content-Type: application/json
