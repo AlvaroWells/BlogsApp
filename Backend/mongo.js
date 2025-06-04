@@ -3,46 +3,47 @@ import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 import Blog from './models/blog.js'
 import User from './models/user.js'
-import { GoogleGenAI } from '@google/genai'
+import generateBlogsWithAI from './utils/generateBlogWithAI.js';
+// import { GoogleGenAI } from '@google/genai'
 
 // Configuración inicial
 const url = process.env.TEST_MONGODB_URI
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINIAI_API_KEY })
+// const ai = new GoogleGenAI({ apiKey: process.env.GEMINIAI_API_KEY })
 
 // Función para generar blogs con IA
-async function generateBlogsWithAI() {
-  const prompt = `
-  Devuélveme un **array JSON plano** con exactamente 2 blogs tecnológicos. Solo responde con los datos, sin texto extra ni etiquetas markdown.
+// async function generateBlogsWithAI() {
+//   const prompt = `
+//   Devuélveme un **array JSON plano** con exactamente 2 blogs tecnológicos. Solo responde con los datos, sin texto extra ni etiquetas markdown.
 
-[
-  {
-    "title": "Título creativo",
-    "author": "Nombre realista",
-    "url": "url-seo-amigable",
-    "likes": 42
-  },
-  {
-    "title": "Otro título creativo",
-    "author": "Otro autor",
-    "url": "otra-url",
-    "likes": 17
-  }
-]
-`
+// [
+//   {
+//     "title": "Título creativo",
+//     "author": "Nombre realista",
+//     "url": "url-seo-amigable",
+//     "likes": 42
+//   },
+//   {
+//     "title": "Otro título creativo",
+//     "author": "Otro autor",
+//     "url": "otra-url",
+//     "likes": 17
+//   }
+// ]
+// `
 
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: [{ role: "user", parts: [{ text: prompt }] }]
-    })
+//   try {
+//     const response = await ai.models.generateContent({
+//       model: "gemini-2.0-flash",
+//       contents: [{ role: "user", parts: [{ text: prompt }] }]
+//     })
     
-    const text = response.candidates[0].content.parts[0].text
-    return text
-  } catch (error) {
-    console.error("Error con Gemini:", error)
-    return null
-  }
-}
+//     const text = response.candidates[0].content.parts[0].text
+//     return text
+//   } catch (error) {
+//     console.error("Error con Gemini:", error)
+//     return null
+//   }
+// }
 
 // Conexión a MongoDB y creación de blogs
 async function main() {
