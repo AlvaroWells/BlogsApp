@@ -4,6 +4,7 @@ import cors from 'cors'
 import mongoose from 'mongoose'
 import blogRouter from './controllers/blogs.js'
 import userRouter from './controllers/users.js'
+import loginRouter from './controllers/login.js'
 import middleware from './utils/middleware.js'
 const app = express()
 
@@ -35,6 +36,7 @@ app.use(middleware.requestLogger)
 /* nexos de entrada a los enrutadores de la app */
 app.use('/api/blogs', blogRouter)
 app.use('/api/users', userRouter)
+app.use('/api/login', loginRouter)
 
 /* Puerta de escucha de la app */
 app.listen(process.env.PORT, () => {
