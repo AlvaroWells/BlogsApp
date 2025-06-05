@@ -1,0 +1,5 @@
+@baseurl = http://localhost:3001/api/blogs
+@token = {{$dotenv TOKEN}}
+
+DELETE  {{baseurl}}/6840057963d675e6f2f49653
+Authorization: Bearer {{token}}

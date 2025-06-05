@@ -1,0 +1,5 @@
+@baseUrl = http://localhost:3001/api
+
+### Petición para obtener todos los blogs ###
+GET {{baseUrl}}/blogs
+

@@ -1,7 +1,4 @@
 @baseUrl = http://localhost:3001/api
 
-### Petición para obtener todos los blogs ###
-#GET {{baseUrl}}/blogs
-
 ### Obtener un blog por ID ###
-GET {{baseUrl}}/blogs/682f0f749277a2db0d7ce473
+GET {{baseUrl}}/blogs/6840057963d675e6f2f49653

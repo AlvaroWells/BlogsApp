@@ -1,0 +1,15 @@
+@baseurl = http://localhost:3001/api
+
+POST {{baseurl}}/login
+Content-Type: application/json
+
+{
+  "username": "Alvaro88",
+  "password": "S3gur@Contr@s3ñ4!"
+}
+
+
+        ###      USUARIO CREADO CON IA, USAR PARA TESTEAR EL LOGIN DE USUARIO     ###
+
+        ###                    username: alvaro88                                 ###
+        ###                    password: S3gur@Contr@s3ñ4!                        ###
