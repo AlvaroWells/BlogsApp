@@ -15,22 +15,34 @@ const requestLogger = (req, res, next) => {
 /* Middleware para extraer el token del paquete de jwt */
 const tokenExtractor = (req, res, next) => {
   const authorization = req.get('authorization')
-  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-    req.token = authorization.subString(7)
-  } else {
-    req.token = null
+  console.log('Authorization header:', authorization) 
+  if (authorization && authorization.startsWith('Bearer')) {
+    req.token = authorization.replace('Bearer ', '')
+    console.log('Token limpio:', req.token)
   }
+  
   next()
 }
 
 /* Middleware para obtener la información del usuario de la base de datos */
 const userExtractor = async (req, res, next) => {
   try{
+    /* Info para el debugger */
+    console.log('SECRET en userExtractor:', process.env.SECRET)
+    console.log('Token recibido:', req.token)
+    /* --------------------- */
+
     const decodedToken = jwt.verify(req.token, process.env.SECRET)
+    /* Info para el debugger */
+    console.log('Token decodificado:', decodedToken)
+
     if (!decodedToken.id) {
       return res.status(401).json({ error: 'token invalid' })
     }
     const user = await User.findById(decodedToken.id)
+      /* Info para el debugger */
+    console.log('Usuario desde el token:', user)
+    
     req.user = user
     next()
   } catch (error) {
