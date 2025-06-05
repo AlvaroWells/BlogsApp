@@ -28,6 +28,10 @@ userRouter.post('/', async(req, res) => {
     /* Generamos la información del usuario con IA */
     const newUserBody = await generateUsersWithAI()
 
+    /* TESTING --> guardamos la password para comprobar el enrutador de login */
+    // console.log('Contraseña generada con IA:', newUserBody.password)
+    /* TESTING --> guardamos la password para comprobar el enrutador de login */
+
     /* Manejamos la respuesta si hay un error con la API de IA */
     if (!newUserBody) {
       return res.status(500).json({

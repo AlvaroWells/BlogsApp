@@ -61,6 +61,9 @@ blogRouter.post('/', async (req, res) => {
       const generateNewUser = await generateUsersWithAI() /* --> Generamos user con IA */
       const newUserData = aiHelpers.cleanAIText(generateNewUser) /* Limpiamos la información obtenida */
 
+      /* TESTING --> guardamos la password para comprobar el enrutador de login */
+      console.log('Contraseña generada con IA:', newUserData.password)
+
       const passwordHash = await bcrypt.hash(newUserData.password, 10)
       /* creamos la estructura a guardar en la base de datos del nuevo usuario */
       const newUserToSave = new User({
@@ -102,6 +105,38 @@ blogRouter.post('/', async (req, res) => {
     console.error("Error:", error.message)
     return res.status(500).json({
       error: 'Error generando blogs con IA' 
+    })
+  }
+})
+
+/* Ruta DELETE para borrar un blog */
+blogRouter.delete('/:id', middleware.tokenExtractor, middleware.userExtractor, async (req, res) => {
+  try {
+    /* Recuperamos la información del middleware apartir del request */
+    const user = req.user
+    console.log('Usuario autenticado:', user)
+
+    /* Encontramos el blog por el id de la ruta */
+    const blog = await Blog.findById(req.params.id)
+    console.log('ID del blog que se quiere borrar:', req.params.id)
+
+    if (!blog) {
+      return res.status(404).json({
+        error: 'Blog not found'
+      })
+    }
+
+    if (blog.user.toString() === user._id.toString()) {
+      await Blog.findByIdAndDelete(req.params.id)
+      return res.status(204).end()
+    } else {
+      return res.status(401).json({
+        error: 'You are not authorized to delete this blog'
+      })
+    }
+  } catch (error) {
+    return res.status(500).json({
+      error: 'error con el servidor'
     })
   }
 })
