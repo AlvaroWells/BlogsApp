@@ -11,17 +11,17 @@ export default async function generateBlogsWithAI() {
       "title": "Título creativo",
       "author": "Nombre realista",
       "url": "url-seo-amigable",
-      "likes": 42
+      "likes": "número aleatório"
     },
     {
       "title": "Otro título creativo",
-      "author": "Otro autor",
+      "author": "Un autor",
       "url": "otra-url",
-      "likes": 17
+      "likes": "número aleatório"
     }
   ]
   `
-try{
+try { 
   const response = await ai.models.generateContent({
     model: 'gemini-2.0-flash',
     contents: [
