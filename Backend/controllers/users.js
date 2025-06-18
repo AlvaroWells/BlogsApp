@@ -48,7 +48,7 @@ userRouter.post('/', async(req, res) => {
     /* Manejamos de forma controlada si existe o no un usuario único en la BD */
     if (userExist) {
       return res.status(400).json({
-        error: 'Username alredy exists'
+        error: `Username alredy exists: ${userExist.username}`
       })
     }
 

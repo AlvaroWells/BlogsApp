@@ -13,7 +13,7 @@ const blogRouter = express.Router()
 /* Ruta para obtener el array de blogs de la api */
 blogRouter.get('/', async (req, res) => {
   try {
-    const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
+    const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 } )
     res.json(blogs)
   } catch (error) {
     console.log('Error obtaining blogs:', error.message)
@@ -24,7 +24,7 @@ blogRouter.get('/', async (req, res) => {
 blogRouter.get('/:id', middleware.requestLogger, async (req, res) => {
   try {
     /* Obtenemos la información del blog de la base de datos */
-    const selectedBlog = await Blog.findById(req.params.id).populate('user', { username: 1, name: 1 })
+    const selectedBlog = await Blog.findById(req.params.id).populate('user', { username: 1, name: 1 } )
 
     if (!selectedBlog) {
       return res.status(400).json({
@@ -51,29 +51,32 @@ blogRouter.get('/:id', middleware.requestLogger, async (req, res) => {
 /* Ruta post para añadir blogs con IA*/
 blogRouter.post('/', async (req, res) => {
   try {
-    /* Buscamos la información de los usuarios en la base de datos */
-    const usersFromDataBase = await User.find({})
-    
-    /* Buscar o crar usuario de prueba */
-    let user = await User.findOne({ username: usersFromDataBase.username })
+    let user = null
+    const aiResponse = await generateUsersWithAI() /* --> Llamada a la función que genera blogs con IA */
+    console.log('Respuesta de la ia:', aiResponse)
+    const userData = aiHelpers.cleanAIText(aiResponse)
+    console.log(userData)
 
-    if (!user) {
-      const generateNewUser = await generateUsersWithAI() /* --> Generamos user con IA */
-      const newUserData = aiHelpers.cleanAIText(generateNewUser) /* Limpiamos la información obtenida */
+    if (userData.userExisting) {
+      user = await User.findOne({ username: userData.username })
 
-      /* TESTING --> guardamos la password para comprobar el enrutador de login */
-      console.log('Contraseña generada con IA:', newUserData.password)
+      if (!user) {
+        return res.status(404).json({
+          error: 'El usuario existente no fue encontrado'
+        })
+      }
+    } else {
+      const saltRounds = 10
+      const passwordHash = await bcrypt.hash(userData.password, saltRounds)
 
-      const passwordHash = await bcrypt.hash(newUserData.password, 10)
-      /* creamos la estructura a guardar en la base de datos del nuevo usuario */
-      const newUserToSave = new User({
-        username: newUserData.username,
-        name: newUserData.name,
-        passwordHash: passwordHash
+      const newUser = await User({
+        username: userData.username,
+        name: userData.name,
+        passwordHash
       })
 
-      await newUserToSave.save() /* --> Guardamos el usuario */
-      user = newUserToSave /* -> necesario para añadirlo a los blogs del usuario */
+      await newUser.save()
+      user = newUser
     }
 
     // /* Llamar a la función de generación de blogs */
